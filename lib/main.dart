@@ -51,9 +51,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   // TODO: create dynamic enemies
   Random _random = Random();
-  int _playerLevel = 1;
-  int _playerXp = 0;
-  int _titanHp = 25;
+  num _playerLevel = 1;
+  num _playerXp = 0;
+  num _titanHp = 5;
   FloatingActionButtonLocation _attackButtonLocation =
       FloatingActionButtonLocation.centerDocked;
 
@@ -74,17 +74,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _attackTitan() {
     setState(() {
-      // TODO: add some RNG to damage dealt
-      int _damageDealt = _playerLevel;
-      if (_titanHp > _damageDealt) {
-        // the player deals normal damage
-        _titanHp -= _damageDealt;
+      // TODO: add some RNG to base damage
+      // TODO: create a die-rolling class
+      bool isCrit = _random.nextInt(20) == 0;
+      num damageDealt = isCrit ? _playerLevel * 2 : _playerLevel;
+      // TODO: announce crit
+      if (_titanHp > damageDealt) {
+        // the player deals damage to the titan
+        _titanHp -= damageDealt;
       } else {
         // the player gains an XP
         _playerXp++;
         // a new titan spawns
         // TODO: choose a random, level-appropriate monster
-        _titanHp = 25;
+        _titanHp =
+            (_playerLevel * 3) + 2 + _random.nextInt(_playerLevel as int);
       }
       if (_playerXp == 4) {
         // the player gains a level
