@@ -125,16 +125,16 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Spacer(flex: 2),
+              const Spacer(flex: 2),
               Text('Your are level $_playerLevel'),
               Text('XP $_playerXp / $_xpToNextLevel'),
-              Spacer(),
-              Text('Titan HP'),
+              const Spacer(),
+              const Text('Titan HP'),
               Text(
                 '$_titanCurrentHp / $_titanMaxHp',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
-              Spacer(flex: 2),
+              const Spacer(flex: 2),
             ],
           ),
         ),
