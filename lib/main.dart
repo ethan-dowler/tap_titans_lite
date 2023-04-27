@@ -49,11 +49,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // TODO: create dynamic enemies
-  Random _random = Random();
-  num _playerLevel = 1;
-  num _playerXp = 0;
-  num _titanHp = 5;
+  // RNG
+  final Random _random = Random();
+
+  // player init
+  int _playerLevel = 1;
+  int _playerXp = 0;
+  int _xpToNextLevel = 100;
+
+  // titan init
+  int _titanMaxHp = 5;
+  int _titanCurrentHp = 5;
+
+  // UI init
   FloatingActionButtonLocation _attackButtonLocation =
       FloatingActionButtonLocation.centerDocked;
 
@@ -61,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (_random.nextInt(3)) {
       case 1:
         {
-          return FloatingActionButtonLocation.centerDocked;
+          return FloatingActionButtonLocation.startDocked;
         }
       case 2:
         {
@@ -69,44 +77,46 @@ class _MyHomePageState extends State<MyHomePage> {
         }
     }
 
-    return FloatingActionButtonLocation.startDocked;
+    return FloatingActionButtonLocation.centerDocked;
   }
 
   void _attackTitan() {
     setState(() {
-      // TODO: add some RNG to base damage
-      // TODO: create a die-rolling class
       bool isCrit = _random.nextInt(20) == 0;
-      num damageDealt = isCrit ? _playerLevel * 2 : _playerLevel;
-      // TODO: announce crit
-      if (_titanHp > damageDealt) {
+      int damageDealt = isCrit ? _playerLevel * 2 : _playerLevel;
+      // TODO: display damage numbers; emphasize if it's a crit
+      if (_titanCurrentHp > damageDealt) {
         // the player deals damage to the titan
-        _titanHp -= damageDealt;
+        _titanCurrentHp -= damageDealt;
       } else {
-        // the player gains an XP
-        _playerXp++;
+        // the player defeats the titan!
+
+        // the player gains XP
+        // TODO: display XP gained
+        int xpGained = _titanMaxHp * 2;
+        int extraXp = xpGained - (_xpToNextLevel - _playerXp);
+        _playerXp += xpGained;
+
+        // the player gains a level if they have enough XP
+        if (_playerXp >= _xpToNextLevel) {
+          _playerLevel++;
+          // XP carries over from one level to the next
+          _playerXp = extraXp;
+          _xpToNextLevel = (_xpToNextLevel * 1.4).round();
+        }
+
         // a new titan spawns
-        // TODO: choose a random, level-appropriate monster
-        _titanHp =
-            (_playerLevel * 3) + 2 + _random.nextInt(_playerLevel as int);
+        _titanMaxHp = (_playerLevel * 3) + _random.nextInt(_playerLevel);
+        _titanCurrentHp = _titanMaxHp;
       }
-      if (_playerXp == 4) {
-        // the player gains a level
-        _playerLevel++;
-        _playerXp = 0;
-      }
+
+      // move the attack button!
       _attackButtonLocation = _randomAttackLocation();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _attackTitan method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
@@ -117,11 +127,11 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Spacer(flex: 2),
               Text('Your are level $_playerLevel'),
-              Text('XP to next level $_playerXp / 4'),
+              Text('XP $_playerXp / $_xpToNextLevel'),
               Spacer(),
               Text('Titan HP'),
               Text(
-                '$_titanHp',
+                '$_titanCurrentHp / $_titanMaxHp',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               Spacer(flex: 2),
